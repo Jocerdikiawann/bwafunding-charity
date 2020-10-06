@@ -7,8 +7,6 @@
     import {charities} from "../data/charities.js";
 
   </script>
-
-  
     <Header/>
     <Welcome/>
     <CharityList {charities} />
