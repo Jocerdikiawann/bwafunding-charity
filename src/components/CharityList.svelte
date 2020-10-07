@@ -1,4 +1,5 @@
 <script>
+  import {onMount,onDestroy,beforeUpdate,afterUpdate} from 'svelte';
   import Modal from "./Modal.svelte";
   //kata kuncinya adalah export bila tida ada export maka properties tidak bisa didapatkan
   export let charities;
@@ -41,6 +42,9 @@
     display: block;
     background-color: rgba(219, 208, 208, 0.45);
   }
+  .pledged{
+    margin-right: 2em;
+  }
 </style>
 
 <!-- popularCauses section -->
@@ -54,9 +58,11 @@
             raise capital from anyone.</p>
         </div><!-- .xs-heading-title END -->
       </div><!-- .row end -->
-      {#if charities !== undefined}
-      {#each charities as charity}
+
+
+      
       <div class="row">
+        {#each charities as charity}
         <div class="col-lg-4 col-md-6">
           
           <!-- modal goes here -->
@@ -127,7 +133,7 @@
               <a href="#" class="xs-post-title xs-mb-30">{charity.title}</a>
 
               <ul class="xs-list-with-content">
-                <li>{formatCurrency(charity.pledged)}<span>Pledged</span></li>
+                <li class="pledged">{formatCurrency(charity.pledged)}<span>Pledged</span></li>
                 <li><span class="number-percentage-count number-percentage" data-value="90"
                     data-animation-duration="3500">{calculateFunded(charity.pledged, charity.target)}</span>% <span>Funded</span></li>
                 <li>{calculateDaysRemaining(charity.date_end)}<span>Days to go</span></li>
@@ -154,9 +160,9 @@
             </div><!-- .xs-item-content END -->
           </div><!-- .xs-popular-item END -->
         </div>
+        {/each}
       </div>
-      {/each}
-      {/if}
+     
       <!-- .row end -->
     </div><!-- .container end -->
   </section>
