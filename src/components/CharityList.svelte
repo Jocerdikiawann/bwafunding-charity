@@ -1,8 +1,8 @@
 <script>
-  import {onMount,onDestroy,beforeUpdate,afterUpdate} from 'svelte';
+  import {charities} from '../store/data.js';
   import Modal from "./Modal.svelte";
-  //kata kuncinya adalah export bila tida ada export maka properties tidak bisa didapatkan
-  export let charities;
+  import Loader from "./Loader.svelte";
+
   let isModalOpen = false;
 
   function calculateFunded(pledged, target) {
@@ -30,7 +30,7 @@
   }
 
   function handleCloseModal(){
-    isModalOpen =false;
+    isModalOpen = false;
   }
 </script>
 
@@ -62,7 +62,7 @@
 
       
       <div class="row">
-        {#each charities as charity}
+        {#each $charities as charity}
         <div class="col-lg-4 col-md-6">
           
           <!-- modal goes here -->
@@ -160,6 +160,8 @@
             </div><!-- .xs-item-content END -->
           </div><!-- .xs-popular-item END -->
         </div>
+        {:else}
+        <Loader/>
         {/each}
       </div>
      

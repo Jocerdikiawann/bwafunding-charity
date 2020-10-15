@@ -1,22 +1,18 @@
 <script>
   import router from 'page';
+  import {params} from '../store/pages.js';
+  import {charity , getCharity} from '../store/data.js';
   import Header from "../components/Header.svelte";
   import Footer from "../components/Footer.svelte";
   import Loader from "../components/Loader.svelte";
-  export let params;
-  let charity,
+
+  let
     amount,
     name,
     email,
     agree = false;
-    let data = getCharity(params.id);
 
-  async function getCharity(id) {
-    const res = await fetch(
-      `https://charity-api-bwa.herokuapp.com/charities/${id}`
-    );
-    return res.json();
-  }
+    getCharity($params.id);
 
   function handleButton() {
     console.log("button submite");
@@ -24,20 +20,37 @@
 
   async function handleForm(event) {
     // definisi ini integer dengan parseInt
-    charity.pledged = charity.pledged + parseInt(amount);
+    data.pledged = data.pledged + parseInt(amount);
     try{
-      const res = await fetch (`https://charity-api-bwa.herokuapp.com/charities/${params.id}`,
+      const res = await fetch (`https://charity-api-bwa.herokuapp.com/charities/${$params.id}`,
       {
       method:'PUT',
       headers:  {
         'content-type' : 'application/json'
       },
-      body: JSON.stringify(charity)
+      body: JSON.stringify(data),
+        }
+    );
+    //digantio redirection ke midtrans
+    const resMid = await fetch(`/.netlify/functions/payment`, {
+      method: 'POST',
+      headers: { 
+        'content-type':'application/json'
+      },
+      body: JSON.stringify({
+        id: $params.id,
+        amount: parseInt(amount),
+        name,
+        email,
+        
+      }),
     });
-    console.log(res);
-    router.redirect('/success')
-    }
-    catch(err){
+
+    const midtransData = await resMid.json();
+    console.log(midtransData);
+    window.location.href = midtransData.url;
+
+    }catch(err){
       console.log(err);
     } 
 
@@ -64,12 +77,12 @@
 <Header />
 <!-- welcome section -->
 <!--breadcumb start here-->
-{#await data}
+{#if !$charity}
   <!-- charity is pending -->
   
   <Loader/>
 
-{:then charity}
+{:else}
   <!-- content here -->
   <section class="xs-banner-inner-section parallax-window" 
          style="background-image:url('/assets/images/slide2.png')">
@@ -77,7 +90,7 @@
             <div class="container">
               <div class="color-white xs-inner-banner-content">
                 <h2>Donate Now</h2>
-                <p>{charity.title}</p>
+                <p>{$charity.title}</p>
                 <ul class="xs-breadcumb">
                   <li class="badge badge-pill badge-primary">
                     <a href="/" class="color-white">Home /</a> Donate
@@ -95,13 +108,13 @@
                 <div class="row">
                   <div class="col-lg-6">
                     <div class="xs-donation-form-images"><img src=
-                    "{charity.thumbnail}" class="img-responsive" alt=
+                    "{$charity.thumbnail}" class="img-responsive" alt=
                     "Family Images"></div>
                   </div>
                   <div class="col-lg-6">
                     <div class="xs-donation-form-wraper">
                       <div class="xs-heading xs-mb-30">
-                        <h2 class="xs-title">{charity.title}</h2>
+                        <h2 class="xs-title">{$charity.title}</h2>
                         <p class="small">To learn more about make donate charity
                           with us visit our "<span class="color-green">Contact
                             us</span>" site. By calling <span class=
@@ -184,6 +197,6 @@
     <!-- End donation form section -->
   </main>
   <!-- promise was fulfilled -->
-{/await}
+{/if}
 
 <Footer />
