@@ -9,6 +9,9 @@
   import Success from "./pages/Succes.svelte"; 
   import Failure from "./pages/Failure.svelte";
 
+
+  export let ready;
+
   // byte code di cek dari yang paling atas dan bergilir 
   router("/", () => ($page = Home));
   router("/about", () => ($page = About));
@@ -29,4 +32,4 @@
   router.start();
 </script>
 
-<svelte:component this={$page} />
+<svelte:component this={$page} {ready} />
